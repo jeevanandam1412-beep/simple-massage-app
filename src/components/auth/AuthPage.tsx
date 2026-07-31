@@ -3,10 +3,10 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { useTheme } from '@/components/providers/ThemeProvider';
-import { Zap, Mail, Lock, User, ArrowRight, CheckCircle2, Radio, Sun, Moon, Sparkles } from 'lucide-react';
+import { Zap, Mail, Lock, User, ArrowRight, Sun, Moon } from 'lucide-react';
 
 export const AuthPage: React.FC = () => {
-  const { signIn, signUp, loginAsGuest } = useAuth();
+  const { signIn, signUp } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [isSignUp, setIsSignUp] = useState(false);
 
@@ -42,12 +42,11 @@ export const AuthPage: React.FC = () => {
 
   return (
     <div className="min-h-screen w-screen bg-[var(--bg-main)] text-[var(--text-main)] flex flex-col items-center justify-center p-4 font-sans select-none relative overflow-hidden transition-colors">
-      {/* Dynamic Glowing Accent Background Gradients */}
-      <div className="absolute -top-40 -left-40 w-96 h-96 bg-indigo-500/20 dark:bg-indigo-500/15 rounded-full blur-3xl pointer-events-none animate-pulse" />
-      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-emerald-500/20 dark:bg-emerald-500/15 rounded-full blur-3xl pointer-events-none animate-pulse" />
+      {/* Subtle Background Glow */}
+      <div className="absolute -top-40 -left-40 w-96 h-96 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Blinko Trending Glassmorphic Auth Card */}
-      <div className="w-full max-w-md glass-panel rounded-3xl p-8 shadow-2xl z-10 relative transition-all duration-300 hover:shadow-indigo-500/10">
+      {/* Clean Blinko Auth Card */}
+      <div className="w-full max-w-md glass-panel rounded-3xl p-8 shadow-2xl z-10 relative">
         {/* Theme Switcher Button */}
         <button
           type="button"
@@ -58,21 +57,14 @@ export const AuthPage: React.FC = () => {
           {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-600" />}
         </button>
 
-        {/* Blinko Header Logo */}
+        {/* Blinko Header */}
         <div className="flex flex-col items-center text-center mb-6">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-indigo-400 text-white flex items-center justify-center font-bold shadow-lg shadow-indigo-500/30 mb-3 animate-bounce">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-indigo-400 text-white flex items-center justify-center font-black shadow-lg shadow-indigo-500/25 mb-3">
             <Zap className="w-7 h-7 fill-white" />
           </div>
-          <h1 className="text-3xl font-black tracking-tight text-[var(--text-main)] flex items-center gap-1.5">
+          <h1 className="text-3xl font-black tracking-tight text-[var(--text-main)]">
             Blinko
-            <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 font-mono font-bold">
-              v2.0
-            </span>
           </h1>
-          <p className="text-xs text-[var(--text-muted)] mt-1 flex items-center gap-1.5 font-mono">
-            <Radio className="w-3 h-3 text-emerald-500 animate-pulse" />
-            Instant Signal-Fast Messaging
-          </p>
         </div>
 
         {/* Tab Selector */}
@@ -177,29 +169,12 @@ export const AuthPage: React.FC = () => {
               <span>Connecting to Blinko...</span>
             ) : (
               <>
-                <span>{isSignUp ? 'Create Blinko Account' : 'Enter Blinko Workspace'}</span>
+                <span>{isSignUp ? 'Sign Up' : 'Sign In'}</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
           </button>
         </form>
-
-        {/* Instant Access Option */}
-        <div className="mt-4 pt-4 border-t border-[var(--border-subtle)]">
-          <button
-            type="button"
-            onClick={() => loginAsGuest(fullName || 'Teammate')}
-            className="w-full py-2.5 bg-[var(--bg-surface)] hover:bg-[var(--bg-hover)] text-[var(--text-main)] border border-[var(--border-subtle)] font-medium rounded-xl text-xs transition-all flex items-center justify-center gap-2"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
-            Instant Access (Bypass Email Rate Limit)
-          </button>
-        </div>
-      </div>
-
-      <div className="mt-6 text-xs text-[var(--text-muted)] flex items-center gap-1 font-mono">
-        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-        Blinko Encrypted Signal Protocol
       </div>
     </div>
   );
