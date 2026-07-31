@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 
@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   title: 'Blinko — Instant Signal Realtime Messaging',
   description: 'Fast, secure, end-to-end encrypted messaging built with Next.js and Supabase WebSockets.',
   manifest: '/manifest.json',
+};
+
+export const viewport: Viewport = {
   themeColor: '#6366f1',
 };
 
