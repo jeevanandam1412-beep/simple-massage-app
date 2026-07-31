@@ -44,17 +44,26 @@ function getValidUUID(): string {
   return '00000000-0000-4000-8000-000000000001';
 }
 
+function isValidUUID(uuidStr?: string): boolean {
+  if (!uuidStr) return false;
+  const regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return regex.test(uuidStr);
+}
+
 export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { profile, user } = useAuth();
 
   const fallbackId = useRef(getValidUUID()).current;
 
-  const currentUser: Profile = profile || {
-    id: user?.id || fallbackId,
-    full_name: user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User',
-    email: user?.email,
+  const validUserId = profile?.id && isValidUUID(profile.id) ? profile.id : (user?.id && isValidUUID(user.id) ? user.id : fallbackId);
+
+  const currentUser: Profile = {
+    id: validUserId,
+    full_name: profile?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Blinko User',
+    email: profile?.email || user?.email,
+    avatar_url: profile?.avatar_url,
     status: 'online',
-    about: 'SaaS Realtime User',
+    about: 'Blinko Realtime Member ⚡',
   };
 
   const [channels, setChannels] = useState<Channel[]>([]);
@@ -84,16 +93,18 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       } else {
         const defaultChanId = getValidUUID();
-        const { data: newChan } = await supabase.from('channels').insert({
+        const { data: newChan, error } = await supabase.from('channels').insert({
           id: defaultChanId,
           name: 'general',
-          description: 'Company-wide announcements and general discussion',
+          description: 'Blinko announcements and discussion',
           is_private: false,
         }).select().single();
 
         if (newChan) {
           setChannels([newChan as Channel]);
           setActiveChannelId(newChan.id);
+        } else if (error) {
+          console.warn('Channel seed notice:', error.message);
         }
       }
     };
@@ -189,7 +200,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       sender: currentUser,
     };
 
-    // Optimistic UI update so the user sees their message instantly
+    // Optimistic UI update
     setMessages((prev) => ({
       ...prev,
       [activeChannelId]: [...(prev[activeChannelId] || []), newMsg],
@@ -197,20 +208,18 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     sendTypingSignal(false);
 
-    // Upsert profile first to prevent 23503 foreign_key_violation error
+    // Upsert profile first to satisfy foreign key constraints
     try {
       await supabase.from('profiles').upsert({
         id: currentUser.id,
         full_name: currentUser.full_name,
         email: currentUser.email,
         status: 'online',
-        about: currentUser.about || 'SaaS Member',
+        about: currentUser.about || 'Blinko Member',
       });
-    } catch (e) {
-      console.warn('Profile sync notice:', e);
-    }
+    } catch (e) {}
 
-    // Insert message into Supabase database
+    // Insert message
     const { error } = await supabase.from('messages').insert({
       id: newMsgId,
       channel_id: activeChannelId,
@@ -231,7 +240,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const formattedName = name.toLowerCase().replace(/\s+/g, '-');
     const newChanId = getValidUUID();
 
-    // Ensure profile exists in DB before setting created_by FK
+    // Upsert profile first
     try {
       await supabase.from('profiles').upsert({
         id: currentUser.id,
@@ -241,17 +250,24 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
     } catch (e) {}
 
-    const { data: newChan } = await supabase.from('channels').insert({
+    const payload: any = {
       id: newChanId,
       name: formattedName,
       description,
       is_private: isPrivate,
-      created_by: currentUser.id,
-    }).select().single();
+    };
+
+    if (isValidUUID(currentUser.id)) {
+      payload.created_by = currentUser.id;
+    }
+
+    const { data: newChan, error } = await supabase.from('channels').insert(payload).select().single();
 
     if (newChan) {
       setChannels((prev) => [...prev, newChan as Channel]);
       setActiveChannelId(newChan.id);
+    } else if (error) {
+      console.warn('Create channel notice:', error.message);
     }
 
     setIsCreateChannelOpen(false);
