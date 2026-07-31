@@ -29,12 +29,18 @@ export const AuthPage: React.FC = () => {
           setIsSubmitting(false);
           return;
         }
-        await signUp(email.trim(), password, fullName.trim());
+        const res = await signUp(email.trim(), password, fullName.trim());
+        if (res?.error) {
+          setErrorMsg(res.error.message);
+        }
       } else {
-        await signIn(email.trim(), password);
+        const res = await signIn(email.trim(), password);
+        if (res?.error) {
+          setErrorMsg(res.error.message);
+        }
       }
     } catch (err: any) {
-      setErrorMsg(err.message || 'An error occurred');
+      setErrorMsg(err.message || 'An error occurred during authentication');
     } finally {
       setIsSubmitting(false);
     }
@@ -102,8 +108,20 @@ export const AuthPage: React.FC = () => {
         {/* Form Inputs */}
         <form onSubmit={handleSubmit} className="space-y-4">
           {errorMsg && (
-            <div className="bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs p-3 rounded-xl">
-              {errorMsg}
+            <div className="bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs p-3 rounded-xl flex flex-col gap-1">
+              <span>{errorMsg}</span>
+              {!isSignUp && errorMsg.toLowerCase().includes('invalid') && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsSignUp(true);
+                    setErrorMsg('');
+                  }}
+                  className="text-[11px] underline text-indigo-400 hover:text-indigo-300 font-semibold text-left mt-1"
+                >
+                  Click here to Create a New Account with this Email
+                </button>
+              )}
             </div>
           )}
 

@@ -13,7 +13,6 @@ interface AuthContextType {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: any }>;
-  loginAsGuest: (fullName?: string) => void;
   signOut: () => Promise<void>;
 }
 
@@ -112,10 +111,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         ? (data as Profile)
         : {
             id: userId,
-            full_name: name || email?.split('@')[0] || 'SaaS Teammate',
+            full_name: name || email?.split('@')[0] || 'Blinko User',
             email: email,
             status: 'online',
-            about: 'SaaS Platform Teammate 🚀',
+            about: 'Blinko Realtime Member ⚡',
           };
 
       if (!data) {
@@ -127,10 +126,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch {
       const fallbackProf: Profile = {
         id: userId,
-        full_name: name || email?.split('@')[0] || 'SaaS Teammate',
+        full_name: name || email?.split('@')[0] || 'Blinko User',
         email: email,
         status: 'online',
-        about: 'SaaS Platform Teammate 🚀',
+        about: 'Blinko Realtime Member ⚡',
       };
       setProfile(fallbackProf);
       saveEncryptedSession(fallbackProf);
@@ -148,28 +147,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(data.user);
       setSession(data.session);
       await syncProfileWithDB(data.user.id, data.user.email);
-    } else {
-      // Create local fallback session if login is rate limited
-      const guestId = '00000000-0000-4000-8000-' + btoa(email).replace(/[^a-zA-Z0-9]/g, '').padEnd(12, '0').slice(0, 12);
-      const fallbackProf: Profile = {
-        id: guestId,
-        full_name: email.split('@')[0],
-        email: email,
-        status: 'online',
-        about: 'SaaS Realtime Member',
-      };
-      setProfile(fallbackProf);
-      setUser({ id: guestId, email } as User);
-      saveEncryptedSession(fallbackProf);
+      setLoading(false);
+      return { error: null };
     }
 
     setLoading(false);
-    return { error: null };
+    return {
+      error: error
+        ? { message: error.message }
+        : { message: 'Invalid email or password. Please try again or create an account.' },
+    };
   };
 
   const signUp = async (email: string, password: string, fullName: string) => {
     setLoading(true);
-    const { data } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -183,7 +175,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       full_name: fullName || email.split('@')[0],
       email: email,
       status: 'online',
-      about: 'SaaS Realtime Member',
+      about: 'Blinko Realtime Member',
     };
 
     setProfile(newProf);
@@ -196,22 +188,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     setLoading(false);
     return { error: null };
-  };
-
-  const loginAsGuest = (fullName?: string) => {
-    setLoading(true);
-    const guestId = typeof window !== 'undefined' && window.crypto?.randomUUID ? window.crypto.randomUUID() : '00000000-0000-4000-8000-000000000002';
-    const guestProf: Profile = {
-      id: guestId,
-      full_name: fullName || 'Instant Teammate',
-      email: 'instant.demo@saasplatform.io',
-      status: 'online',
-      about: 'Instant Demo Member ⚡',
-    };
-    setProfile(guestProf);
-    setUser({ id: guestId, email: guestProf.email } as User);
-    saveEncryptedSession(guestProf);
-    setLoading(false);
   };
 
   const signOut = async () => {
@@ -233,7 +209,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loading,
         signIn,
         signUp,
-        loginAsGuest,
         signOut,
       }}
     >
