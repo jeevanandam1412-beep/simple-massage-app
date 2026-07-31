@@ -4,6 +4,7 @@ import React from 'react';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { AuthProvider, useAuth } from '@/components/providers/AuthProvider';
 import { ChatProvider, useChat } from '@/components/providers/ChatProvider';
+import { PWAProvider } from '@/components/providers/PWAProvider';
 import { AuthPage } from '@/components/auth/AuthPage';
 import { WorkspaceRail } from '@/components/saas/WorkspaceRail';
 import { ChannelSidebar } from '@/components/saas/ChannelSidebar';
@@ -86,7 +87,9 @@ export default function SignalSaaSApp() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <MainDashboard />
+        <PWAProvider>
+          <MainDashboard />
+        </PWAProvider>
       </AuthProvider>
     </ThemeProvider>
   );

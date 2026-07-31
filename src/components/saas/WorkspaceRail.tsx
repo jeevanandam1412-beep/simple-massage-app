@@ -3,11 +3,13 @@
 import React from 'react';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { useTheme } from '@/components/providers/ThemeProvider';
-import { Shield, Sun, Moon, LogOut, Zap, Layers, Terminal } from 'lucide-react';
+import { usePWA } from '@/components/providers/PWAProvider';
+import { Shield, Sun, Moon, LogOut, Zap, Download, Smartphone } from 'lucide-react';
 
 export const WorkspaceRail: React.FC = () => {
   const { signOut, profile, user } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { isInstallable, installPWA } = usePWA();
 
   const displayName = profile?.full_name || user?.email || 'User';
 
@@ -31,6 +33,17 @@ export const WorkspaceRail: React.FC = () => {
         >
           <Zap className="w-5 h-5" />
         </div>
+
+        {/* PWA Install Button (if prompt available) */}
+        {isInstallable && (
+          <button
+            onClick={installPWA}
+            className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 hover:bg-emerald-500/30 transition-colors animate-pulse"
+            title="Install PWA Desktop / Mobile App"
+          >
+            <Download className="w-5 h-5" />
+          </button>
+        )}
       </div>
 
       {/* Theme Switcher & Logout Buttons */}
