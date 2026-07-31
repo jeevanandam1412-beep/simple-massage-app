@@ -2,10 +2,12 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/components/providers/AuthProvider';
-import { Shield, Mail, Lock, User, ArrowRight, CheckCircle2, Radio } from 'lucide-react';
+import { useTheme } from '@/components/providers/ThemeProvider';
+import { Shield, Mail, Lock, User, ArrowRight, CheckCircle2, Radio, Sun, Moon } from 'lucide-react';
 
 export const AuthPage: React.FC = () => {
   const { signIn, signUp } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [isSignUp, setIsSignUp] = useState(false);
 
   const [fullName, setFullName] = useState('');
@@ -41,26 +43,36 @@ export const AuthPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen w-screen bg-black text-white flex flex-col items-center justify-center p-4 font-sans select-none relative overflow-hidden">
-      {/* Background Subtle Gradient & Grid Accent */}
-      <div className="absolute inset-0 bg-[radial-gradient(#333_1px,transparent_1px)] [background-size:24px_24px] opacity-20 pointer-events-none" />
+    <div className="min-h-screen w-screen bg-black dark:bg-black light:bg-zinc-100 text-white dark:text-white light:text-zinc-900 flex flex-col items-center justify-center p-4 font-sans select-none relative overflow-hidden transition-colors">
+      {/* Background Accent Grid */}
+      <div className="absolute inset-0 bg-[radial-gradient(#333_1px,transparent_1px)] dark:bg-[radial-gradient(#333_1px,transparent_1px)] light:bg-[radial-gradient(#ccc_1px,transparent_1px)] [background-size:24px_24px] opacity-20 pointer-events-none" />
 
       {/* Main SaaS Auth Card */}
-      <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-3xl p-8 shadow-2xl z-10 relative">
+      <div className="w-full max-w-md bg-zinc-900 dark:bg-zinc-900 light:bg-white border border-zinc-800 dark:border-zinc-800 light:border-zinc-300 rounded-3xl p-8 shadow-2xl z-10 relative">
+        {/* Top Theme Switcher Button */}
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="absolute top-6 right-6 p-2 rounded-xl bg-zinc-950 dark:bg-zinc-950 light:bg-zinc-100 border border-zinc-800 dark:border-zinc-800 light:border-zinc-300 text-zinc-400 dark:text-zinc-400 light:text-zinc-700 hover:text-white dark:hover:text-white light:hover:text-black transition-colors"
+          title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+        >
+          {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-zinc-900" />}
+        </button>
+
         {/* Header Logo */}
         <div className="flex flex-col items-center text-center mb-8">
-          <div className="w-12 h-12 rounded-2xl bg-white text-black flex items-center justify-center font-bold shadow-lg mb-3">
+          <div className="w-12 h-12 rounded-2xl bg-white dark:bg-white light:bg-black text-black dark:text-black light:text-white flex items-center justify-center font-bold shadow-lg mb-3">
             <Shield className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">Signal SaaS Platform</h1>
-          <p className="text-xs text-zinc-400 mt-1 flex items-center gap-1.5 font-mono">
+          <h1 className="text-2xl font-bold tracking-tight text-white dark:text-white light:text-zinc-900">Signal SaaS Platform</h1>
+          <p className="text-xs text-zinc-400 dark:text-zinc-400 light:text-zinc-600 mt-1 flex items-center gap-1.5 font-mono">
             <Radio className="w-3 h-3 text-emerald-400 animate-pulse" />
             Live Supabase WebSocket Realtime
           </p>
         </div>
 
         {/* Tab Selector */}
-        <div className="flex bg-zinc-950 p-1 rounded-2xl border border-zinc-800 mb-6">
+        <div className="flex bg-zinc-950 dark:bg-zinc-950 light:bg-zinc-100 p-1 rounded-2xl border border-zinc-800 dark:border-zinc-800 light:border-zinc-300 mb-6">
           <button
             type="button"
             onClick={() => {
@@ -68,7 +80,9 @@ export const AuthPage: React.FC = () => {
               setErrorMsg('');
             }}
             className={`flex-1 py-2 text-xs font-semibold rounded-xl transition-colors ${
-              !isSignUp ? 'bg-white text-black shadow' : 'text-zinc-400 hover:text-white'
+              !isSignUp
+                ? 'bg-white dark:bg-white light:bg-black text-black dark:text-black light:text-white shadow'
+                : 'text-zinc-400 dark:text-zinc-400 light:text-zinc-600 hover:text-white dark:hover:text-white light:hover:text-black'
             }`}
           >
             Sign In
@@ -80,7 +94,9 @@ export const AuthPage: React.FC = () => {
               setErrorMsg('');
             }}
             className={`flex-1 py-2 text-xs font-semibold rounded-xl transition-colors ${
-              isSignUp ? 'bg-white text-black shadow' : 'text-zinc-400 hover:text-white'
+              isSignUp
+                ? 'bg-white dark:bg-white light:bg-black text-black dark:text-black light:text-white shadow'
+                : 'text-zinc-400 dark:text-zinc-400 light:text-zinc-600 hover:text-white dark:hover:text-white light:hover:text-black'
             }`}
           >
             Sign Up
@@ -97,7 +113,7 @@ export const AuthPage: React.FC = () => {
 
           {isSignUp && (
             <div>
-              <label className="block text-xs font-medium text-zinc-300 mb-1">
+              <label className="block text-xs font-medium text-zinc-300 dark:text-zinc-300 light:text-zinc-700 mb-1">
                 Full Name
               </label>
               <div className="relative">
@@ -107,7 +123,7 @@ export const AuthPage: React.FC = () => {
                   placeholder="Alex Rivera"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="w-full bg-black text-white text-sm rounded-xl pl-10 pr-4 py-2.5 border border-zinc-800 focus:border-white outline-none transition-colors"
+                  className="w-full bg-black dark:bg-black light:bg-zinc-100 text-white dark:text-white light:text-zinc-900 text-sm rounded-xl pl-10 pr-4 py-2.5 border border-zinc-800 dark:border-zinc-800 light:border-zinc-300 focus:border-white outline-none transition-colors"
                   required={isSignUp}
                 />
               </div>
@@ -115,7 +131,7 @@ export const AuthPage: React.FC = () => {
           )}
 
           <div>
-            <label className="block text-xs font-medium text-zinc-300 mb-1">
+            <label className="block text-xs font-medium text-zinc-300 dark:text-zinc-300 light:text-zinc-700 mb-1">
               Email Address
             </label>
             <div className="relative">
@@ -125,14 +141,14 @@ export const AuthPage: React.FC = () => {
                 placeholder="name@company.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-black text-white text-sm rounded-xl pl-10 pr-4 py-2.5 border border-zinc-800 focus:border-white outline-none transition-colors"
+                className="w-full bg-black dark:bg-black light:bg-zinc-100 text-white dark:text-white light:text-zinc-900 text-sm rounded-xl pl-10 pr-4 py-2.5 border border-zinc-800 dark:border-zinc-800 light:border-zinc-300 focus:border-white outline-none transition-colors"
                 required
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-zinc-300 mb-1">
+            <label className="block text-xs font-medium text-zinc-300 dark:text-zinc-300 light:text-zinc-700 mb-1">
               Password
             </label>
             <div className="relative">
@@ -142,7 +158,7 @@ export const AuthPage: React.FC = () => {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-black text-white text-sm rounded-xl pl-10 pr-4 py-2.5 border border-zinc-800 focus:border-white outline-none transition-colors"
+                className="w-full bg-black dark:bg-black light:bg-zinc-100 text-white dark:text-white light:text-zinc-900 text-sm rounded-xl pl-10 pr-4 py-2.5 border border-zinc-800 dark:border-zinc-800 light:border-zinc-300 focus:border-white outline-none transition-colors"
                 required
               />
             </div>
@@ -151,7 +167,7 @@ export const AuthPage: React.FC = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3 bg-white hover:bg-zinc-200 text-black font-semibold rounded-xl text-sm transition-all flex items-center justify-center gap-2 mt-2 shadow-lg disabled:opacity-50"
+            className="w-full py-3 bg-white dark:bg-white light:bg-black hover:opacity-90 text-black dark:text-black light:text-white font-semibold rounded-xl text-sm transition-all flex items-center justify-center gap-2 mt-2 shadow-lg disabled:opacity-50"
           >
             {isSubmitting ? (
               <span>Connecting to Supabase...</span>
