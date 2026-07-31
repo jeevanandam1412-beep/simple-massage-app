@@ -1,38 +1,61 @@
 'use client';
 
 import React from 'react';
+import { ThemeProvider } from '@/components/providers/ThemeProvider';
+import { AuthProvider, useAuth } from '@/components/providers/AuthProvider';
 import { ChatProvider } from '@/components/providers/ChatProvider';
-import { Sidebar } from '@/components/chat/Sidebar';
-import { ChatHeader } from '@/components/chat/ChatHeader';
-import { MessageThread } from '@/components/chat/MessageThread';
-import { MessageInput } from '@/components/chat/MessageInput';
-import { CallModal } from '@/components/modals/CallModal';
-import { SettingsModal } from '@/components/modals/SettingsModal';
-import { NewChatModal } from '@/components/modals/NewChatModal';
+import { AuthPage } from '@/components/auth/AuthPage';
+import { WorkspaceRail } from '@/components/saas/WorkspaceRail';
+import { ChannelSidebar } from '@/components/saas/ChannelSidebar';
+import { SaaSHeader } from '@/components/saas/SaaSHeader';
+import { RealtimeThread } from '@/components/saas/RealtimeThread';
+import { RealtimeComposer } from '@/components/saas/RealtimeComposer';
+import { CreateChannelModal } from '@/components/modals/CreateChannelModal';
 import { SafetyNumberModal } from '@/components/modals/SafetyNumberModal';
-import { MediaViewer } from '@/components/chat/MediaViewer';
 
-export default function SignalApp() {
+function MainDashboard() {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="h-screen w-screen bg-black text-white flex items-center justify-center font-mono text-xs">
+        <div className="flex items-center gap-3">
+          <span className="w-3 h-3 rounded-full bg-white animate-ping" />
+          <span>Authenticating Supabase Session...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <AuthPage />;
+  }
+
   return (
     <ChatProvider>
-      <main className="flex h-screen w-screen overflow-hidden bg-[#090d16] text-slate-100 font-sans">
-        {/* Sidebar Navigation */}
-        <Sidebar />
+      <div className="flex h-screen w-screen overflow-hidden bg-black text-zinc-100 font-sans transition-colors">
+        <WorkspaceRail />
+        <ChannelSidebar />
 
-        {/* Active Chat Conversation View */}
-        <section className="flex-1 flex flex-col h-full min-w-0 bg-slate-950/40 relative">
-          <ChatHeader />
-          <MessageThread />
-          <MessageInput />
+        <section className="flex-1 flex flex-col h-full min-w-0 bg-black relative">
+          <SaaSHeader />
+          <RealtimeThread />
+          <RealtimeComposer />
         </section>
 
-        {/* Global Application Modals & Overlays */}
-        <CallModal />
-        <SettingsModal />
-        <NewChatModal />
+        <CreateChannelModal />
         <SafetyNumberModal />
-        <MediaViewer />
-      </main>
+      </div>
     </ChatProvider>
+  );
+}
+
+export default function SignalSaaSApp() {
+  return (
+    <ThemeProvider>
+      <AuthProvider>
+        <MainDashboard />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

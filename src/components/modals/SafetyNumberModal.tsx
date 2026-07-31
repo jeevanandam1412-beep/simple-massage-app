@@ -7,17 +7,15 @@ import { generateSafetyNumber } from '@/lib/crypto';
 import { ShieldCheck, CheckCircle2, QrCode, Copy, Check } from 'lucide-react';
 
 export const SafetyNumberModal: React.FC = () => {
-  const { isSafetyModalOpen, closeSafetyModal, activeContact, currentUser } = useChat();
+  const { isSafetyOpen, setIsSafetyOpen, currentUser } = useChat();
   const [safetyNumber, setSafetyNumber] = useState<string>('');
   const [isCopied, setIsCopied] = useState(false);
 
   useEffect(() => {
-    if (activeContact && currentUser) {
-      generateSafetyNumber(currentUser.id, activeContact.id).then(setSafetyNumber);
+    if (currentUser) {
+      generateSafetyNumber(currentUser.id, 'saas-teammate-id').then(setSafetyNumber);
     }
-  }, [activeContact, currentUser]);
-
-  if (!activeContact) return null;
+  }, [currentUser]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(safetyNumber);
@@ -27,10 +25,10 @@ export const SafetyNumberModal: React.FC = () => {
 
   return (
     <Dialog
-      isOpen={isSafetyModalOpen}
-      onClose={closeSafetyModal}
+      isOpen={isSafetyOpen}
+      onClose={() => setIsSafetyOpen(false)}
       title="Verify Safety Numbers"
-      description={`To verify the end-to-end security of your chat with ${activeContact.name}, compare the numbers below with their device.`}
+      description="To verify the end-to-end security of your SaaS workspace session, compare the numbers below with your team's device."
     >
       <div className="space-y-6">
         {/* Safety Number Digits Grid */}
@@ -44,7 +42,7 @@ export const SafetyNumberModal: React.FC = () => {
             <QrCode className="w-32 h-32 text-slate-900" />
           </div>
           <p className="text-xs text-slate-400 mt-3 text-center">
-            Scan QR code with {activeContact.name}&apos;s device to instantly mark verified.
+            Scan QR code with teammate device to mark safety number verified.
           </p>
         </div>
 
