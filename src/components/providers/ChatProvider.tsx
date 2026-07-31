@@ -83,7 +83,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setActiveChannelId(data[0].id);
         }
       } else {
+        const defaultChanId = getValidUUID();
         const { data: newChan } = await supabase.from('channels').insert({
+          id: defaultChanId,
           name: 'general',
           description: 'Company-wide announcements and general discussion',
           is_private: false,
@@ -187,6 +189,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       sender: currentUser,
     };
 
+    // Optimistic UI update so the user sees their message instantly
     setMessages((prev) => ({
       ...prev,
       [activeChannelId]: [...(prev[activeChannelId] || []), newMsg],
@@ -194,6 +197,20 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     sendTypingSignal(false);
 
+    // Upsert profile first to prevent 23503 foreign_key_violation error
+    try {
+      await supabase.from('profiles').upsert({
+        id: currentUser.id,
+        full_name: currentUser.full_name,
+        email: currentUser.email,
+        status: 'online',
+        about: currentUser.about || 'SaaS Member',
+      });
+    } catch (e) {
+      console.warn('Profile sync notice:', e);
+    }
+
+    // Insert message into Supabase database
     const { error } = await supabase.from('messages').insert({
       id: newMsgId,
       channel_id: activeChannelId,
@@ -206,14 +223,26 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     if (error) {
-      console.warn('Postgres insert message notice:', error.message);
+      console.warn('Message insert notice:', error.message);
     }
   };
 
   const createChannel = async (name: string, description: string, isPrivate: boolean) => {
     const formattedName = name.toLowerCase().replace(/\s+/g, '-');
-    const { data: newChan, error } = await supabase.from('channels').insert({
-      id: getValidUUID(),
+    const newChanId = getValidUUID();
+
+    // Ensure profile exists in DB before setting created_by FK
+    try {
+      await supabase.from('profiles').upsert({
+        id: currentUser.id,
+        full_name: currentUser.full_name,
+        email: currentUser.email,
+        status: 'online',
+      });
+    } catch (e) {}
+
+    const { data: newChan } = await supabase.from('channels').insert({
+      id: newChanId,
       name: formattedName,
       description,
       is_private: isPrivate,
