@@ -21,6 +21,7 @@ interface ChatContextType {
   searchQuery: string;
   isCreateChannelOpen: boolean;
   isSafetyOpen: boolean;
+  isMobileSidebarOpen: boolean;
   
   // Actions
   setActiveChannelId: (id: string) => void;
@@ -30,6 +31,8 @@ interface ChatContextType {
   sendTypingSignal: (isTyping: boolean) => void;
   setIsCreateChannelOpen: (open: boolean) => void;
   setIsSafetyOpen: (open: boolean) => void;
+  setIsMobileSidebarOpen: (open: boolean) => void;
+  toggleMobileSidebar: () => void;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -52,15 +55,16 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [typingUsers, setTypingUsers] = useState<TypingState[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Modals
+  // Modals & Navigation
   const [isCreateChannelOpen, setIsCreateChannelOpen] = useState(false);
   const [isSafetyOpen, setIsSafetyOpen] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const activeChannelRef = useRef<RealtimeChannel | null>(null);
 
   const activeChannel = channels.find((c) => c.id === activeChannelId) || null;
 
-  // 1. Fetch Real-time Channels from Supabase Database (0 Mock Data)
+  // 1. Fetch Real-time Channels from Supabase Database
   useEffect(() => {
     const loadChannels = async () => {
       const { data } = await supabase.from('channels').select('*').order('created_at', { ascending: true });
@@ -70,7 +74,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setActiveChannelId(data[0].id);
         }
       } else {
-        // Initial default channel if DB table is empty
         const { data: newChan } = await supabase.from('channels').insert({
           name: 'general',
           description: 'Company-wide announcements and general discussion',
@@ -148,6 +151,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, [activeChannelId, currentUser.id]);
 
+  const handleSelectChannel = (id: string) => {
+    setActiveChannelId(id);
+    setIsMobileSidebarOpen(false);
+  };
+
   const sendRealtimeMessage = async (
     content: string,
     type: Message['type'] = 'text',
@@ -170,7 +178,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       sender: currentUser,
     };
 
-    // Optimistic UI update
     setMessages((prev) => ({
       ...prev,
       [activeChannelId]: [...(prev[activeChannelId] || []), newMsg],
@@ -178,7 +185,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     sendTypingSignal(false);
 
-    // Save to Supabase DB
     await supabase.from('messages').insert({
       id: newMsgId,
       channel_id: activeChannelId,
@@ -206,6 +212,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     setIsCreateChannelOpen(false);
+    setIsMobileSidebarOpen(false);
   };
 
   const sendTypingSignal = (isTyping: boolean) => {
@@ -217,6 +224,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isTyping
     );
   };
+
+  const toggleMobileSidebar = () => setIsMobileSidebarOpen((prev) => !prev);
 
   return (
     <ChatContext.Provider
@@ -231,13 +240,16 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         searchQuery,
         isCreateChannelOpen,
         isSafetyOpen,
-        setActiveChannelId,
+        isMobileSidebarOpen,
+        setActiveChannelId: handleSelectChannel,
         setSearchQuery,
         sendRealtimeMessage,
         createChannel,
         sendTypingSignal,
         setIsCreateChannelOpen,
         setIsSafetyOpen,
+        setIsMobileSidebarOpen,
+        toggleMobileSidebar,
       }}
     >
       {children}
