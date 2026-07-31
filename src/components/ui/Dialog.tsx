@@ -39,21 +39,21 @@ export const Dialog: React.FC<DialogProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-in fade-in duration-200">
       <div
         className={cn(
-          'relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl text-slate-100 animate-in zoom-in-95 duration-200 overflow-hidden',
+          'relative w-full max-w-lg bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-3xl p-6 shadow-2xl text-[var(--text-main)] animate-in zoom-in-95 duration-200 overflow-hidden transition-colors',
           className
         )}
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-slate-100 hover:bg-slate-800 p-1.5 rounded-full transition-colors"
+          className="absolute top-4 right-4 text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-hover)] p-1.5 rounded-full transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
 
         {(title || description) && (
           <div className="mb-5 pr-6">
-            {title && <h2 className="text-xl font-bold text-slate-100">{title}</h2>}
-            {description && <p className="text-sm text-slate-400 mt-1">{description}</p>}
+            {title && <h2 className="text-xl font-bold text-[var(--text-main)]">{title}</h2>}
+            {description && <p className="text-sm text-[var(--text-muted)] mt-1">{description}</p>}
           </div>
         )}
 

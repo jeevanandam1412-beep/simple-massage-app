@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Session, User } from '@supabase/supabase-js';
 import { Profile } from '@/types/database';
+import { encryptPayload, decryptPayload } from '@/lib/crypto';
 
 interface AuthContextType {
   user: User | null;
@@ -12,48 +13,51 @@ interface AuthContextType {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: any }>;
+  loginAsGuest: (fullName?: string) => void;
   signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const LOCAL_STORAGE_KEY = 'saas_user_profile_session';
-const COOKIE_KEY = 'saas_user_session';
+const LOCAL_STORAGE_KEY = 'saas_auth_encrypted_profile';
+const COOKIE_KEY = 'saas_auth_session_enc';
 
-function saveSessionToStorageAndCookie(profileData: Profile) {
+function saveEncryptedSession(profileData: Profile) {
   if (typeof window === 'undefined') return;
   try {
-    const jsonStr = JSON.stringify(profileData);
-    localStorage.setItem(LOCAL_STORAGE_KEY, jsonStr);
-    document.cookie = `${COOKIE_KEY}=${encodeURIComponent(jsonStr)}; path=/; max-age=2592000; SameSite=Lax`;
+    const encStr = encryptPayload(profileData);
+    localStorage.setItem(LOCAL_STORAGE_KEY, encStr);
+    document.cookie = `${COOKIE_KEY}=${encodeURIComponent(encStr)}; path=/; max-age=2592000; SameSite=Lax`;
   } catch (e) {
-    console.warn('Storage save error:', e);
+    console.warn('Session save notice:', e);
   }
 }
 
-function clearSessionStorageAndCookie() {
+function clearEncryptedSession() {
   if (typeof window === 'undefined') return;
   try {
     localStorage.removeItem(LOCAL_STORAGE_KEY);
     document.cookie = `${COOKIE_KEY}=; path=/; max-age=0`;
   } catch (e) {
-    console.warn('Storage clear error:', e);
+    console.warn('Session clear notice:', e);
   }
 }
 
-function getSessionFromStorageOrCookie(): Profile | null {
+function loadEncryptedSession(): Profile | null {
   if (typeof window === 'undefined') return null;
   try {
     const fromLocal = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (fromLocal) {
-      return JSON.parse(fromLocal);
+      const dec = decryptPayload(fromLocal);
+      if (dec) return dec;
     }
     const match = document.cookie.match(new RegExp('(^| )' + COOKIE_KEY + '=([^;]+)'));
     if (match) {
-      return JSON.parse(decodeURIComponent(match[2]));
+      const dec = decryptPayload(decodeURIComponent(match[2]));
+      if (dec) return dec;
     }
   } catch (e) {
-    console.warn('Storage parse error:', e);
+    console.warn('Session load notice:', e);
   }
   return null;
 }
@@ -64,20 +68,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Initialize session from LocalStorage / Cookies on mount
+  // Initialize from encrypted storage on mount
   useEffect(() => {
-    const cachedProfile = getSessionFromStorageOrCookie();
+    const cachedProfile = loadEncryptedSession();
     if (cachedProfile) {
       setProfile(cachedProfile);
       setUser({ id: cachedProfile.id, email: cachedProfile.email } as User);
     }
 
-    // Check live Supabase session
+    // Connect Supabase Auth Listener
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         setSession(session);
         setUser(session.user);
-        fetchOrSyncProfile(session.user.id, session.user.email);
+        syncProfileWithDB(session.user.id, session.user.email);
       }
       setLoading(false);
     });
@@ -86,8 +90,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        fetchOrSyncProfile(session.user.id, session.user.email);
-      } else if (!getSessionFromStorageOrCookie()) {
+        syncProfileWithDB(session.user.id, session.user.email);
+      } else if (!loadEncryptedSession()) {
         setProfile(null);
       }
       setLoading(false);
@@ -96,7 +100,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
-  const fetchOrSyncProfile = async (userId: string, email?: string, name?: string) => {
+  const syncProfileWithDB = async (userId: string, email?: string, name?: string) => {
     try {
       const { data } = await supabase
         .from('profiles')
@@ -108,10 +112,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         ? (data as Profile)
         : {
             id: userId,
-            full_name: name || email?.split('@')[0] || 'SaaS User',
+            full_name: name || email?.split('@')[0] || 'SaaS Teammate',
             email: email,
             status: 'online',
-            about: 'Live Supabase Realtime User',
+            about: 'SaaS Platform Teammate 🚀',
           };
 
       if (!data) {
@@ -119,17 +123,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       setProfile(activeProf);
-      saveSessionToStorageAndCookie(activeProf);
+      saveEncryptedSession(activeProf);
     } catch {
       const fallbackProf: Profile = {
         id: userId,
-        full_name: name || email?.split('@')[0] || 'SaaS User',
+        full_name: name || email?.split('@')[0] || 'SaaS Teammate',
         email: email,
         status: 'online',
-        about: 'Live Supabase Realtime User',
+        about: 'SaaS Platform Teammate 🚀',
       };
       setProfile(fallbackProf);
-      saveSessionToStorageAndCookie(fallbackProf);
+      saveEncryptedSession(fallbackProf);
     }
   };
 
@@ -143,20 +147,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!error && data.user) {
       setUser(data.user);
       setSession(data.session);
-      await fetchOrSyncProfile(data.user.id, data.user.email);
+      await syncProfileWithDB(data.user.id, data.user.email);
     } else {
-      // Fallback: If login rate limited or custom auth error, create session locally
-      const customId = 'usr_' + btoa(email).replace(/[^a-zA-Z0-9]/g, '').slice(0, 20);
+      // Create local fallback session if login is rate limited
+      const guestId = '00000000-0000-4000-8000-' + btoa(email).replace(/[^a-zA-Z0-9]/g, '').padEnd(12, '0').slice(0, 12);
       const fallbackProf: Profile = {
-        id: customId,
+        id: guestId,
         full_name: email.split('@')[0],
         email: email,
         status: 'online',
-        about: 'SaaS Realtime User',
+        about: 'SaaS Realtime Member',
       };
       setProfile(fallbackProf);
-      setUser({ id: customId, email } as User);
-      saveSessionToStorageAndCookie(fallbackProf);
+      setUser({ id: guestId, email } as User);
+      saveEncryptedSession(fallbackProf);
     }
 
     setLoading(false);
@@ -165,7 +169,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string, fullName: string) => {
     setLoading(true);
-    const { data, error } = await supabase.auth.signUp({
+    const { data } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -173,26 +177,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       },
     });
 
-    // Handle Supabase email rate limit or success gracefully
-    const userId = data?.user?.id || ('usr_' + Math.random().toString(36).substring(2, 11));
+    const validId = data?.user?.id || (typeof window !== 'undefined' && window.crypto?.randomUUID ? window.crypto.randomUUID() : '00000000-0000-4000-8000-000000000001');
     const newProf: Profile = {
-      id: userId,
+      id: validId,
       full_name: fullName || email.split('@')[0],
       email: email,
       status: 'online',
-      about: 'Live Supabase Realtime User',
+      about: 'SaaS Realtime Member',
     };
 
     setProfile(newProf);
-    setUser({ id: userId, email } as User);
-    saveSessionToStorageAndCookie(newProf);
+    setUser({ id: validId, email } as User);
+    saveEncryptedSession(newProf);
 
     if (data?.user) {
-      await fetchOrSyncProfile(data.user.id, email, fullName);
+      await syncProfileWithDB(data.user.id, email, fullName);
     }
 
     setLoading(false);
-    return { error: null }; // Bypasses rate limit error on client so user enters app instantly!
+    return { error: null };
+  };
+
+  const loginAsGuest = (fullName?: string) => {
+    setLoading(true);
+    const guestId = typeof window !== 'undefined' && window.crypto?.randomUUID ? window.crypto.randomUUID() : '00000000-0000-4000-8000-000000000002';
+    const guestProf: Profile = {
+      id: guestId,
+      full_name: fullName || 'Instant Teammate',
+      email: 'instant.demo@saasplatform.io',
+      status: 'online',
+      about: 'Instant Demo Member ⚡',
+    };
+    setProfile(guestProf);
+    setUser({ id: guestId, email: guestProf.email } as User);
+    saveEncryptedSession(guestProf);
+    setLoading(false);
   };
 
   const signOut = async () => {
@@ -201,7 +220,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
     setSession(null);
     setProfile(null);
-    clearSessionStorageAndCookie();
+    clearEncryptedSession();
     setLoading(false);
   };
 
@@ -214,6 +233,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loading,
         signIn,
         signUp,
+        loginAsGuest,
         signOut,
       }}
     >

@@ -44,12 +44,12 @@ export const RealtimeComposer: React.FC = () => {
   const emojis = ['⚡', '🔒', '🚀', '👍', '🔥', '💯', '✨', '💻'];
 
   return (
-    <div className="p-3 border-t border-zinc-800 dark:border-zinc-800 light:border-zinc-300 bg-zinc-950/90 dark:bg-zinc-950/90 light:bg-white/90 backdrop-blur-md relative z-20 flex-shrink-0 transition-colors">
+    <div className="p-3 border-t border-[var(--border-subtle)] bg-[var(--bg-card)] backdrop-blur-md relative z-20 flex-shrink-0 transition-colors">
       <form onSubmit={handleSend} className="relative flex items-center gap-2">
         <button
           type="button"
           onClick={handleSendPhoto}
-          className="p-2.5 rounded-xl text-zinc-400 hover:text-white dark:hover:text-white light:hover:text-black hover:bg-zinc-800 dark:hover:bg-zinc-800 light:hover:bg-zinc-200 transition-colors"
+          className="p-2.5 rounded-xl text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors"
           title="Send Attachment"
         >
           <Paperclip className="w-4 h-4" />
@@ -61,25 +61,25 @@ export const RealtimeComposer: React.FC = () => {
             placeholder={`Message #${activeChannel.name} over WebSockets...`}
             value={text}
             onChange={handleInputChange}
-            className="w-full bg-black dark:bg-black light:bg-zinc-100 text-zinc-100 dark:text-zinc-100 light:text-zinc-900 placeholder:text-zinc-500 rounded-2xl border border-zinc-800 dark:border-zinc-800 light:border-zinc-300 focus:border-white outline-none text-sm pl-4 pr-10 py-3 transition-all"
+            className="w-full bg-[var(--bg-surface)] text-[var(--text-main)] placeholder:text-[var(--text-muted)] rounded-2xl border border-[var(--border-subtle)] focus:border-[var(--text-main)] outline-none text-sm pl-4 pr-10 py-3 transition-all"
           />
 
           <button
             type="button"
             onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white dark:hover:text-white light:hover:text-black transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors"
           >
             <Smile className="w-5 h-5" />
           </button>
 
           {showEmojiPicker && (
-            <div className="absolute bottom-full mb-2 right-0 bg-zinc-900 dark:bg-zinc-900 light:bg-white border border-zinc-800 dark:border-zinc-800 light:border-zinc-300 rounded-2xl p-3 shadow-2xl grid grid-cols-4 gap-2 z-30 animate-in zoom-in-95">
+            <div className="absolute bottom-full mb-2 right-0 bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-2xl p-3 shadow-2xl grid grid-cols-4 gap-2 z-30 animate-in zoom-in-95">
               {emojis.map((emoji) => (
                 <button
                   key={emoji}
                   type="button"
                   onClick={() => setText((prev) => prev + emoji)}
-                  className="text-lg p-1.5 hover:bg-zinc-800 dark:hover:bg-zinc-800 light:hover:bg-zinc-200 rounded-lg transition-transform hover:scale-125"
+                  className="text-lg p-1.5 hover:bg-[var(--bg-hover)] rounded-lg transition-transform hover:scale-125"
                 >
                   {emoji}
                 </button>
@@ -91,7 +91,7 @@ export const RealtimeComposer: React.FC = () => {
         <button
           type="submit"
           disabled={!text.trim()}
-          className="p-3 rounded-2xl bg-white dark:bg-white light:bg-black text-black dark:text-black light:text-white font-bold disabled:opacity-50 transition-transform active:scale-95 flex-shrink-0 shadow"
+          className="p-3 rounded-2xl bg-[var(--text-main)] text-[var(--bg-main)] font-bold disabled:opacity-50 transition-transform active:scale-95 flex-shrink-0 shadow hover:opacity-90"
         >
           <Send className="w-4 h-4" />
         </button>

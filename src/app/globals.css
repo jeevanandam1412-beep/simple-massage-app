@@ -4,35 +4,39 @@
 
 @layer base {
   :root {
-    --bg-primary: #ffffff;
-    --bg-secondary: #f4f4f5;
+    --bg-main: #ffffff;
+    --bg-surface: #f4f4f5;
     --bg-card: #ffffff;
     --bg-hover: #e4e4e7;
-    --border-color: #e4e4e7;
-    --text-primary: #09090b;
-    --text-secondary: #71717a;
+    --border-subtle: #e4e4e7;
+    --border-strong: #d4d4d8;
+    --text-main: #09090b;
+    --text-muted: #71717a;
     --accent-signal: #0284c7;
     --accent-emerald: #059669;
+    --accent-badge: #e4e4e7;
   }
 
   .dark {
-    --bg-primary: #000000;
-    --bg-secondary: #09090b;
+    --bg-main: #000000;
+    --bg-surface: #09090b;
     --bg-card: #18181b;
     --bg-hover: #27272a;
-    --border-color: #27272a;
-    --text-primary: #f4f4f5;
-    --text-secondary: #a1a1aa;
+    --border-subtle: #27272a;
+    --border-strong: #3f3f46;
+    --text-main: #f4f4f5;
+    --text-muted: #a1a1aa;
     --accent-signal: #2b9bfb;
     --accent-emerald: #10b981;
+    --accent-badge: #27272a;
   }
 
   body {
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
+    background-color: var(--bg-main);
+    color: var(--text-main);
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     overflow: hidden;
-    transition: background-color 0.25s ease, color 0.25s ease;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 }
 
@@ -47,10 +51,10 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border-color);
+  background: var(--border-subtle);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-secondary);
+  background: var(--text-muted);
 }

@@ -22,21 +22,21 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-signal-500/50 disabled:opacity-50 disabled:pointer-events-events-none select-none active:scale-[0.98]';
+      'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 focus:outline-none disabled:opacity-50 disabled:pointer-events-none select-none active:scale-[0.98]';
 
     const variants = {
       primary:
-        'bg-signal-600 hover:bg-signal-500 text-white shadow-lg shadow-signal-600/25 border border-signal-400/20',
+        'bg-[var(--text-main)] text-[var(--bg-main)] hover:opacity-90 shadow-md font-bold',
       secondary:
-        'bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700/60 shadow-sm',
+        'bg-[var(--bg-surface)] hover:bg-[var(--bg-hover)] text-[var(--text-main)] border border-[var(--border-subtle)]',
       outline:
-        'border border-slate-700 hover:bg-slate-800/80 text-slate-300 hover:text-white',
+        'border border-[var(--border-subtle)] hover:bg-[var(--bg-hover)] text-[var(--text-main)]',
       ghost:
-        'text-slate-400 hover:text-slate-100 hover:bg-slate-800/60',
+        'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-hover)]',
       destructive:
-        'bg-rose-600 hover:bg-rose-500 text-white shadow-md shadow-rose-600/20 border border-rose-400/20',
+        'bg-rose-600 hover:bg-rose-500 text-white shadow-md',
       icon:
-        'text-slate-400 hover:text-white hover:bg-slate-800/80 rounded-full p-2.5',
+        'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-hover)] rounded-full p-2.5',
     };
 
     const sizes = {

@@ -32,20 +32,20 @@ export const CreateChannelModal: React.FC = () => {
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+          <label className="block text-xs font-semibold text-[var(--text-main)] mb-1.5">
             Channel Name
           </label>
           <Input
             placeholder="e.g. security-audit"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            icon={<Hash className="w-4 h-4 text-slate-400" />}
+            icon={<Hash className="w-4 h-4 text-[var(--text-muted)]" />}
             required
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+          <label className="block text-xs font-semibold text-[var(--text-main)] mb-1.5">
             Description (Optional)
           </label>
           <Input
@@ -55,23 +55,23 @@ export const CreateChannelModal: React.FC = () => {
           />
         </div>
 
-        <div className="flex items-center justify-between p-3 bg-slate-950 rounded-xl border border-slate-800">
+        <div className="flex items-center justify-between p-3 bg-[var(--bg-surface)] rounded-xl border border-[var(--border-subtle)]">
           <div className="flex items-center gap-2">
             <Lock className="w-4 h-4 text-amber-400" />
             <div>
-              <p className="text-xs font-semibold text-slate-200">Make Private</p>
-              <p className="text-[11px] text-slate-400">Only invited members can access</p>
+              <p className="text-xs font-semibold text-[var(--text-main)]">Make Private</p>
+              <p className="text-[11px] text-[var(--text-muted)]">Only invited members can access</p>
             </div>
           </div>
           <input
             type="checkbox"
             checked={isPrivate}
             onChange={(e) => setIsPrivate(e.target.checked)}
-            className="w-4 h-4 rounded bg-slate-900 border-slate-700 text-signal-600 focus:ring-signal-500/20"
+            className="w-4 h-4 rounded bg-[var(--bg-main)] border-[var(--border-subtle)] text-[var(--text-main)] focus:ring-[var(--text-main)]"
           />
         </div>
 
-        <div className="flex justify-end gap-2 pt-3 border-t border-slate-800">
+        <div className="flex justify-end gap-2 pt-3 border-t border-[var(--border-subtle)]">
           <Button variant="ghost" onClick={() => setIsCreateChannelOpen(false)}>
             Cancel
           </Button>
