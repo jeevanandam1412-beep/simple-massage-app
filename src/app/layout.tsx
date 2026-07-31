@@ -1,27 +1,14 @@
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
 import './globals.css';
-import type { Metadata, Viewport } from 'next';
+
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Signal SaaS — End-to-End Encrypted Realtime Platform',
-  description: 'Private, secure SaaS messaging platform powered by Next.js, Supabase WebSockets, and PWA support.',
+  title: 'Blinko — Instant Signal Realtime Messaging',
+  description: 'Fast, secure, end-to-end encrypted messaging built with Next.js and Supabase WebSockets.',
   manifest: '/manifest.json',
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'black-translucent',
-    title: 'Signal SaaS',
-  },
-  icons: {
-    icon: '/favicon.ico',
-    apple: '/apple-touch-icon.png',
-  },
-};
-
-export const viewport: Viewport = {
-  themeColor: '#000000',
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  themeColor: '#6366f1',
 };
 
 export default function RootLayout({
@@ -31,17 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="bg-black text-slate-100 antialiased h-screen w-screen overflow-hidden">
-        {children}
-      </body>
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }

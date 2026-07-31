@@ -4,31 +4,33 @@
 
 @layer base {
   :root {
-    --bg-main: #ffffff;
-    --bg-surface: #f4f4f5;
-    --bg-card: #ffffff;
-    --bg-hover: #e4e4e7;
-    --border-subtle: #e4e4e7;
-    --border-strong: #d4d4d8;
-    --text-main: #09090b;
-    --text-muted: #71717a;
-    --accent-signal: #0284c7;
-    --accent-emerald: #059669;
-    --accent-badge: #e4e4e7;
+    --bg-main: #f8fafc;
+    --bg-surface: #ffffff;
+    --bg-card: rgba(255, 255, 255, 0.85);
+    --bg-hover: #f1f5f9;
+    --border-subtle: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --accent-brand: #6366f1;
+    --accent-brand-hover: #4f46e5;
+    --accent-emerald: #10b981;
+    --shadow-glow: 0 10px 30px -10px rgba(99, 102, 241, 0.15);
   }
 
   .dark {
-    --bg-main: #000000;
-    --bg-surface: #09090b;
-    --bg-card: #18181b;
+    --bg-main: #09090b;
+    --bg-surface: #121215;
+    --bg-card: rgba(24, 24, 27, 0.85);
     --bg-hover: #27272a;
     --border-subtle: #27272a;
     --border-strong: #3f3f46;
-    --text-main: #f4f4f5;
-    --text-muted: #a1a1aa;
-    --accent-signal: #2b9bfb;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --accent-brand: #818cf8;
+    --accent-brand-hover: #6366f1;
     --accent-emerald: #10b981;
-    --accent-badge: #27272a;
+    --shadow-glow: 0 10px 30px -10px rgba(129, 140, 248, 0.25);
   }
 
   body {
@@ -36,14 +38,28 @@
     color: var(--text-main);
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     overflow: hidden;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
+}
+
+/* Glassmorphism Utilities */
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-subtle);
+}
+
+.glass-pill {
+  background: var(--bg-surface);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-subtle);
 }
 
 /* Custom Sleek Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {

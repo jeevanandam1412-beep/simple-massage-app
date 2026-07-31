@@ -1,31 +1,16 @@
 {
-  "name": "Signal SaaS Platform",
-  "short_name": "Signal SaaS",
-  "description": "End-to-End Encrypted Realtime SaaS Messaging Platform powered by Next.js and Supabase WebSockets",
+  "name": "Blinko — Instant Signal Messaging",
+  "short_name": "Blinko",
+  "description": "Fast, secure, end-to-end encrypted messaging platform.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
-  "orientation": "portrait-primary",
+  "background_color": "#09090b",
+  "theme_color": "#6366f1",
   "icons": [
     {
-      "src": "/icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Open Channels",
-      "url": "/",
-      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
     }
   ]
 }

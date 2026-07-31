@@ -38,18 +38,18 @@ export const RealtimeComposer: React.FC = () => {
       'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
     ];
     const image = sampleImages[Math.floor(Math.random() * sampleImages.length)];
-    sendRealtimeMessage('Realtime Attachment', 'image', image);
+    sendRealtimeMessage('Blinko Attachment', 'image', image);
   };
 
   const emojis = ['⚡', '🔒', '🚀', '👍', '🔥', '💯', '✨', '💻'];
 
   return (
-    <div className="p-3 border-t border-[var(--border-subtle)] bg-[var(--bg-card)] backdrop-blur-md relative z-20 flex-shrink-0 transition-colors">
+    <div className="p-3 border-t border-[var(--border-subtle)] glass-panel relative z-20 flex-shrink-0 transition-colors">
       <form onSubmit={handleSend} className="relative flex items-center gap-2">
         <button
           type="button"
           onClick={handleSendPhoto}
-          className="p-2.5 rounded-xl text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors"
+          className="p-2.5 rounded-2xl text-[var(--text-muted)] hover:text-indigo-500 hover:bg-[var(--bg-hover)] transition-all hover:scale-105"
           title="Send Attachment"
         >
           <Paperclip className="w-4 h-4" />
@@ -58,28 +58,28 @@ export const RealtimeComposer: React.FC = () => {
         <div className="relative flex-1">
           <input
             type="text"
-            placeholder={`Message #${activeChannel.name} over WebSockets...`}
+            placeholder={`Message #${activeChannel.name} on Blinko...`}
             value={text}
             onChange={handleInputChange}
-            className="w-full bg-[var(--bg-surface)] text-[var(--text-main)] placeholder:text-[var(--text-muted)] rounded-2xl border border-[var(--border-subtle)] focus:border-[var(--text-main)] outline-none text-sm pl-4 pr-10 py-3 transition-all"
+            className="w-full bg-[var(--bg-surface)] text-[var(--text-main)] placeholder:text-[var(--text-muted)] rounded-full border border-[var(--border-subtle)] focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none text-sm pl-5 pr-11 py-3 transition-all shadow-inner"
           />
 
           <button
             type="button"
             onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-indigo-500 transition-colors"
           >
             <Smile className="w-5 h-5" />
           </button>
 
           {showEmojiPicker && (
-            <div className="absolute bottom-full mb-2 right-0 bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-2xl p-3 shadow-2xl grid grid-cols-4 gap-2 z-30 animate-in zoom-in-95">
+            <div className="absolute bottom-full mb-3 right-0 glass-panel rounded-3xl p-3 shadow-2xl grid grid-cols-4 gap-2 z-30 animate-in zoom-in-95 border border-indigo-500/20">
               {emojis.map((emoji) => (
                 <button
                   key={emoji}
                   type="button"
                   onClick={() => setText((prev) => prev + emoji)}
-                  className="text-lg p-1.5 hover:bg-[var(--bg-hover)] rounded-lg transition-transform hover:scale-125"
+                  className="text-xl p-2 hover:bg-[var(--bg-hover)] rounded-xl transition-transform hover:scale-125"
                 >
                   {emoji}
                 </button>
@@ -91,7 +91,7 @@ export const RealtimeComposer: React.FC = () => {
         <button
           type="submit"
           disabled={!text.trim()}
-          className="p-3 rounded-2xl bg-[var(--text-main)] text-[var(--bg-main)] font-bold disabled:opacity-50 transition-transform active:scale-95 flex-shrink-0 shadow hover:opacity-90"
+          className="p-3.5 rounded-full bg-gradient-to-r from-indigo-600 to-indigo-500 text-white font-bold disabled:opacity-50 transition-all active:scale-95 flex-shrink-0 shadow-lg shadow-indigo-500/25 hover:scale-105"
         >
           <Send className="w-4 h-4" />
         </button>
