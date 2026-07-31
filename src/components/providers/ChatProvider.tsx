@@ -37,11 +37,20 @@ interface ChatContextType {
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
+function getValidUUID(): string {
+  if (typeof window !== 'undefined' && window.crypto && window.crypto.randomUUID) {
+    return window.crypto.randomUUID();
+  }
+  return '00000000-0000-4000-8000-000000000001';
+}
+
 export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { profile, user } = useAuth();
 
+  const fallbackId = useRef(getValidUUID()).current;
+
   const currentUser: Profile = profile || {
-    id: user?.id || 'guest',
+    id: user?.id || fallbackId,
     full_name: user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User',
     email: user?.email,
     status: 'online',
@@ -163,7 +172,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   ) => {
     if (!activeChannelId || !content.trim()) return;
 
-    const newMsgId = `msg_${Date.now()}`;
+    const newMsgId = getValidUUID();
     const nowIso = new Date().toISOString();
 
     const newMsg: Message = {
@@ -185,7 +194,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     sendTypingSignal(false);
 
-    await supabase.from('messages').insert({
+    const { error } = await supabase.from('messages').insert({
       id: newMsgId,
       channel_id: activeChannelId,
       sender_id: currentUser.id,
@@ -195,11 +204,16 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       is_encrypted: true,
       created_at: nowIso,
     });
+
+    if (error) {
+      console.warn('Postgres insert message notice:', error.message);
+    }
   };
 
   const createChannel = async (name: string, description: string, isPrivate: boolean) => {
     const formattedName = name.toLowerCase().replace(/\s+/g, '-');
-    const { data: newChan } = await supabase.from('channels').insert({
+    const { data: newChan, error } = await supabase.from('channels').insert({
+      id: getValidUUID(),
       name: formattedName,
       description,
       is_private: isPrivate,
